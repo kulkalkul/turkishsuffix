@@ -6,6 +6,7 @@ turkishsuffix uses math and ordered data to dynamically calculate possibilities 
 For now, turkishsuffix has 2 main components:
 * _\_\_init\_\_.py_
 * _config.ini_
+
 In future, I might modularize init file to make it more developer friendly. Right now, my main goal is functionality and effectivity.
 
 ### Which Features are Working Right Now?
@@ -53,6 +54,8 @@ suffix.set_suffix(suffix type)
 # How Useful is turkishsuffix?
 
 Programmers usually avoid using suffixes while coding in Turkish. The reason behind that is Turkish having a complex suffix system. For example, an easy one, plural form (çokluk hali) is done with lar or ler. If latest vowel of the word is soft, word's suffix must be ler, if not the suffix must be lar. If we delve deeper, it becomes more complicated. Sometimes some situations require extra letters, some require both hard/soft and  rounded/unrounded to be calculated. Because of this complexity, as I said at start, programmers avoid using suffixes. Instead of "Bora'nın", "Deniz'in", "Umut'un" and etc., they simply add another word into sentence and add suffix to that word. For example they add "bey" and those became "Bora Bey'in", "Deniz ,Bey'in" and "Umut Bey'in". While this can be used in Turkish, we should encourage people to use  formal ones more. If we can encourage people to use this, even Facebook may change how they approach into this issue.
+
+You can check out the examples at /examples.
 
 (Bilkent Üniversitesi'**ne**)
 
