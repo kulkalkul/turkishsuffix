@@ -46,7 +46,7 @@ suffix = turkishsuffix.Suffix(word, suffix type) # suffix type is optional
 Suffix methods:
 ```python
 suffix.get_suffix()
-suffix.get_word(special) # special = boolean
+suffix.get_word(special, type) # special = boolean, both are optional.
 suffix.get_old_word()
 suffix.set_suffix(suffix type)
 ```
