@@ -1,24 +1,24 @@
-import turkishsuffix
+from turkishsuffix import TurkishSuffix
+name = TurkishSuffix("Bora")
 
-users = "Muhittin", "Abdullah", "Bora", "Eyşan", "Ayşe", "Kamuran", "Fatma", "Kezban", "Burçin", "Rüya", "Umut", "Umutcan", "Su", "Ne", "Kitap", "Elif", "Karargah", "Ağaç", "Kaltak", "Dut", "Fas", "Fiş", "Tren"
+print("Merhaba, hoş geldiniz, {} ulaşmak için {} aramak isterseniz {} telefon numarasını size verebiliriz. İster miydiniz?".format(name.get_word("yönelme", True), name.get_word("belirtme", True), name.get_word("ilgi", True)))
+
+liste = "Muhittin", "Abdullah", "Bora", "Eyşan", "Ayşe", "Kamuran", "Fatma", "Kezban", "Burçin", "Rüya", "Umut", "Umutcan", "Su", "Ne", "Kitap", "Elif", "Karargah", "Ağaç", "Kaltak", "Dut", "Fas", "Fiş", "Tren"
 
 
-for user in users:
-    userSuffix = turkishsuffix.Suffix(user, "çokluk")
-    print(userSuffix.get_word())
-    userSuffix.set_suffix("ilgi")
-    print(userSuffix.get_word(True))
-    userSuffix.set_suffix("eşitlik")
-    print(userSuffix.get_word(False))
-    userSuffix.set_suffix("yönelme")
-    print(userSuffix.get_word(True))
-    userSuffix.set_suffix("belirtme")
-    print(userSuffix.get_word())
-    userSuffix.set_suffix("bulunma")
-    print(userSuffix.get_word(True))
-    userSuffix.set_suffix("ayrılma")
-    print(userSuffix.get_word(False))
-
-name = turkishsuffix.Suffix("Bora")
-
-print("Merhaba, hoş geldiniz, {} ulaşmak için {} aramak isterseniz {} telefon numarasını size verebiliriz. İster miydiniz?".format(name.get_word(True, "yönelme"), name.get_word(True, "belirtme"), name.get_word(True, "ilgi")))
+for item in liste:
+    iyelik = TurkishSuffix(item)
+    print(iyelik.get_word("iyelik", False, "1t"))
+    print(iyelik.get_word("iyelik", False, "2t"))
+    print(iyelik.get_word("iyelik", False, "3t"))
+    print(iyelik.get_word("iyelik", False, "1ç"))
+    print(iyelik.get_word("iyelik", False, "2ç"))
+    print(iyelik.get_word("iyelik", False, "3ç"))
+    print(iyelik.get_word("çokluk"))
+    print(iyelik.get_word("ilgi", True))
+    print(iyelik.get_word("eşitlik"))
+    print(iyelik.get_word("yönelme"))
+    print(iyelik.get_word("belirtme"))
+    print(iyelik.get_word("bulunma"))
+    print(iyelik.get_word("ayrılma"))
+    print(iyelik.get_word())
