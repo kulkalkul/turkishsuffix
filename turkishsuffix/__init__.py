@@ -1,0 +1,1 @@
+from .suffix import TurkishSuffix
