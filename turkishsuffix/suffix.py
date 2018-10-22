@@ -1,4 +1,7 @@
-from .loader import config
+from .config_loader import config
+
+settings = config["settings"]
+exceptions = config["exceptions"]
 
 
 # The main class.
@@ -33,14 +36,14 @@ class TurkishSuffix:
         """
         self._type = _type
         self._word = self._old_word
-        rule_set = config.rule_set[config.types.index(_type)]
+        rule_set = settings["rule_set"][settings["types"].index(_type)]
         index, division = int(rule_set[0]), int(rule_set[1])
         first, last = rule_set[2], rule_set[3]
         for i, letter in enumerate(self._old_word[::-1]):
             first = self._check_hards(rule_set, first, letter)
-            if letter in config.vowels:
+            if letter in settings["vowels"]:
                 first = self._check_vowel(rule_set, first, _type, i)
-                vowel = config.suffixes[index + config.vowels.index(letter) // 2 % division]
+                vowel = settings["suffixes"][index + settings["vowels"].index(letter) // 2 % division]
                 self._suffix = first.replace("-", "").replace("+", "") + vowel + last.replace("-", "")
                 return vowel, i
 
@@ -52,7 +55,7 @@ class TurkishSuffix:
         _possessive               - STRING  - Possessive state of the suffix.
         """
         self._possessive = _possessive
-        possessive = config.possessive[int(_possessive[1].replace("t", "0").replace("ç", "3"))
+        possessive = settings["possessive"][int(_possessive[1].replace("t", "0").replace("ç", "3"))
                                        + int(_possessive[0]) - 1]
         if ";" in possessive:
             self._set_suffix("çokluk")
@@ -61,14 +64,13 @@ class TurkishSuffix:
         else:
             vowel, i = self._set_suffix("iyelik")
             first, last = possessive[0], possessive[1]
-            rule_set = config.rule_set[config.types.index(_type)]
-            if i < 1 and self._word.lower() not in config.exceptions[config.types.index(_type)]\
-                    and ":" not in possessive and "," not in possessive:
+            rule_set = settings["rule_set"][settings["types"].index(_type)]
+            if i < 1 and self._word.lower() not in exceptions[_type] and ":" not in possessive and "," not in possessive:
                 self._suffix = first.replace("-", "").replace("+", "") + last.replace("-", "")
             else:
                 self._suffix = first.replace("-", "").replace("+", "") + vowel + last.replace("-", "")
-            if i > 0 or self._word.lower() in config.exceptions[config.types.index(_type)] or "," in possessive:
-                if self._word.lower() in config.exceptions[config.types.index(_type)]:
+            if i > 0 or self._word.lower() in exceptions[_type] or "," in possessive:
+                if self._word.lower() in exceptions[_type]:
                     possessive = possessive.replace(",", "")
                 consonant = self._check_vowel(possessive, rule_set[2], _type, i)
                 if ":" in possessive:
@@ -86,12 +88,12 @@ class TurkishSuffix:
         Returns:
         _first                    - STRING  - First letter from the rule-set with hard check.
         """
-        if _letter in config.hards:
+        if _letter in settings["hards"]:
             if _first[0] in "cd":
-                _first = _first.replace(_first[0], config.hards[config.softs.index(_first[0])])
+                _first = _first.replace(_first[0], settings["hards"][settings["softs"].index(_first[0])])
             elif ";" in _rule_set:
-                if config.hards.index(_letter) < 4:
-                    self._word = self._old_word[:-1] + config.softs[config.hards.index(_letter)]
+                if settings["hards"].index(_letter) < 4:
+                    self._word = self._old_word[:-1] + settings["softs"][settings["hards"].index(_letter)]
         return _first
 
     def _check_vowel(self, _rule_set, _first, _type, _i):
@@ -108,7 +110,7 @@ class TurkishSuffix:
         """
         if _i < 1:
             if ":" in _rule_set:
-                if self._word.lower() in config.exceptions[config.types.index(_type)]:
+                if self._word.lower() in exceptions[_type]:
                     _first = _first.replace("+", "y")
                 else:
                     _first = _first.replace("+", "n")
