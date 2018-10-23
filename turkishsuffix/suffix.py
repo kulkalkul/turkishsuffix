@@ -39,11 +39,12 @@ class TurkishSuffix:
         rule_set = settings["rule_set"][settings["types"].index(_type)]
         index, division = int(rule_set[0]), int(rule_set[1])
         first, last = rule_set[2], rule_set[3]
+        major = self._check_major()
         for i, letter in enumerate(self._old_word[::-1]):
             first = self._check_hards(rule_set, first, letter)
             if letter in settings["vowels"]:
                 first = self._check_vowel(rule_set, first, _type, i)
-                vowel = settings["suffixes"][index + settings["vowels"].index(letter) // 2 % division]
+                vowel = settings["suffixes"][index + settings["vowels"].index(letter) // 2 % division + major]
                 self._suffix = first.replace("-", "").replace("+", "") + vowel + last.replace("-", "")
                 return vowel, i
 
@@ -119,6 +120,11 @@ class TurkishSuffix:
             else:
                 _first = _first.replace("+", "y")
         return _first
+
+    def _check_major(self):
+        if self._word.lower() in exceptions["major_vowel_exception"]:
+            return 1
+        return 0
 
     def get_word(self, _type=None, _proper=False, _possessive=None):
         """Public method that returns the word with proper suffix and changes.
