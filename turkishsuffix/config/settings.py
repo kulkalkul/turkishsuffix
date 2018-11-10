@@ -40,7 +40,7 @@ possessive = (
                 "mz:", "nz:", "--;"
 )
 
-suffixes = (
+suffix_vowels = (
                 "a", "e",
                 "ı", "i", "u", "ü"
 )
