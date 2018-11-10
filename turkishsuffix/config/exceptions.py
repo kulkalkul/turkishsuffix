@@ -1,13 +1,13 @@
-ilgi = [
+ilgi = (
             "su",
             "ne"
-]
-iyelik = [
+)
+iyelik = (
             "su",
             "ne"
-]
+)
 
-major_vowel_exception = {
+major_vowel_exception = (
                             "ahval",
                             "akropol",
                             "alkol",
@@ -129,4 +129,4 @@ major_vowel_exception = {
                             "zeval",
                             "ziraat"
 
-}
+)
