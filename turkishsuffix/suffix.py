@@ -18,15 +18,19 @@ class TurkishSuffix:
         index, division, first, last = int(index), int(division), first.replace("-", ""), last.replace("-", "")
 
         last_vowel = self.__vowel_from_backwards(word)
-        vowel = self.__vowel_harmony(index, division, last_vowel)
+        vowel = self.__vowel_harmony(word, index, division, last_vowel)
         first, consonant = self.__hards_and_softs(word, first, last_vowel, options)
         first = self.__buffer_letter(word, suffix_type, first, last_vowel, options)
 
         return word[:-1] + consonant + first + vowel + last
 
-    def __vowel_harmony(self, index, division, last_vowel):
-        vowel_harmony = index + Settings.vowels.index(last_vowel) // 2 % division
+    def __vowel_harmony(self, word, index, division, last_vowel):
+        major = self.__major_vowel(word)
+        vowel_harmony = index + Settings.vowels.index(last_vowel) // 2 % division + major
         return Settings.suffix_vowels[vowel_harmony]
+
+    def __major_vowel(self, word):
+        return word.lower() in Exceptions.major_vowel_exception
 
     def __vowel_from_backwards(self, word):
         vowel_from_backwards = (letter for letter in word[::-1] if letter in Settings.vowels)
@@ -56,4 +60,4 @@ class TurkishSuffix:
 
 turkishSuffix = TurkishSuffix()
 
-# print(turkishSuffix.suffix("bora", "ilgi"))
+# print(turkishSuffix.suffix("hayal", "ilgi"))
