@@ -1,10 +1,11 @@
-ilgi = (
+buffer_exception = (
             "su",
             "ne"
 )
-iyelik = (
-            "su",
-            "ne"
+
+buffer_exception_types = (
+            "ilgi",
+            "iyelik"
 )
 
 major_vowel_exception = (
