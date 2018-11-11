@@ -11,18 +11,20 @@ Exceptions = config["exceptions"]
 class TurkishSuffix:
     def __init__(self):
         self.__rule_set = dict(zip(Settings.types, Settings.rule_set))
+        self.__buffer_exceptions = dict(zip(Exceptions.buffer_exception_types, Exceptions.buffer_exception))
 
     def suffix(self, word, suffix_type):
         index, division, first, last, *options = self.__rule_set[suffix_type]
         index, division, first, last = int(index), int(division), first.replace("-", ""), last.replace("-", "")
 
         last_vowel = self.__vowel_from_backwards(word)
-        vowel = self.__vowel_harmony(word, index, division, last_vowel)
+        vowel = self.__vowel_harmony(index, division, last_vowel)
         first, consonant = self.__hards_and_softs(word, first, last_vowel, options)
+        first = self.__buffer_letter(word, suffix_type, first, last_vowel, options)
 
         return word[:-1] + consonant + first + vowel + last
 
-    def __vowel_harmony(self, word, index, division, last_vowel):
+    def __vowel_harmony(self, index, division, last_vowel):
         vowel_harmony = index + Settings.vowels.index(last_vowel) // 2 % division
         return Settings.suffix_vowels[vowel_harmony]
 
@@ -41,5 +43,17 @@ class TurkishSuffix:
         elif ";" in options:
             return first, Settings.softs[Settings.hards.index(last_letter)]
 
+    def __buffer_letter(self, word, suffix_type, first, vowel, options):
+        if vowel is not word[-1]:
+            return first.replace("+", "")
+        if ":" not in options:
+            return first.replace("+", "n")
+        elif word.lower() in self.__buffer_exceptions[suffix_type]:
+            return first.replace("+", "y")
+        else:
+            return first.replace("+", "n")
+
 
 turkishSuffix = TurkishSuffix()
+
+# print(turkishSuffix.suffix("bora", "ilgi"))
