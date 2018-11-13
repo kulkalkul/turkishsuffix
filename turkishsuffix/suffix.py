@@ -22,7 +22,18 @@ class TurkishSuffix:
         self.__possessive_rule_set = dict(zip(Settings.possessive_types, Settings.possessive_rule_set))
         self.__buffer_exceptions = dict({key: Exceptions.buffer_exception for key in Exceptions.buffer_exception_types})
 
-    def suffix(self, word, suffix_type, apostrophe=False, possessive=None):
+    def suffix(self, word: str, suffix_type: str, apostrophe: bool = False, possessive: str = None) -> SuffixWord:
+        """
+
+        :param word: Word which will suffixed.
+        :param suffix_type: The suffix which will suffix the word. It should be either of these: "çokluk", "ilgi",
+        "eşitlik", "yönelme", "belirtme", "bulunma", "ayrılma" and "iyelik".
+        :param apostrophe: If true, apostrophe will split the word and suffix. Also, word is preserved form post-suffix
+        changes. It should be either of these: True and False.
+        :param possessive: If set, this declares the person state of the possessive suffix. It should be one of these:
+        "1t", "2t", "3t", "1ç", "2ç", "3ç" and False.
+        :rtype: SuffixWord
+        """
         if suffix_type not in self.__rule_set:
             raise KeyError("'{}' Hint: There is no suffix type with that name.".format(suffix_type))
         index, division, first, last, *options = self.__rule_set[suffix_type]
