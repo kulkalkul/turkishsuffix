@@ -1,4 +1,4 @@
-types = [
+types = (
             "çokluk",
             "ilgi",
             "eşitlik",
@@ -7,24 +7,24 @@ types = [
             "bulunma",
             "ayrılma",
             "iyelik"
-]
+)
 
-vowels = [
+vowels = (
             "a", "ı",
             "e", "i",
             "o", "u",
             "ö", "ü"
-]
+)
 
-softs = [
-            "c", "ğ", "b", "d"
-]
+softs = (
+            "c", "d", "b", "ğ"
+)
 
-hards = [
-            "ç", "k", "p", "t", "s", "ş", "f", "h"
-]
+hards = (
+            "ç", "t", "p", "k", "s", "ş", "f", "h"
+)
 
-rule_set = [
+rule_set = (
                 "02lr",
                 "24+n:;",
                 "02c-",
@@ -32,15 +32,30 @@ rule_set = [
                 "24+-;",
                 "02d-",
                 "02dn",
-                "24+-|;"
-]
+                "24+-;,"
+)
 
-possessive = [
+possessive_types = (
+                    "1t", "2t", "3t",
+                    "1ç", "2ç", "3ç"
+)
+
+possessive_rule_set = (
                 "-m", "-n", "+-,",
                 "mz:", "nz:", "--;"
-]
+)
 
-suffixes = [
+suffix_vowels = (
                 "a", "e",
                 "ı", "i", "u", "ü"
-]
+)
+
+uppercase_i = (
+                "İ", "I"
+)
+
+lowercase_i = (
+                "i", "ı"
+)
+
+turkish_i = (*uppercase_i, *lowercase_i)

@@ -1,13 +1,14 @@
-ilgi = [
+buffer_exception = (
             "su",
             "ne"
-]
-iyelik = [
-            "su",
-            "ne"
-]
+)
 
-major_vowel_exception = {
+buffer_exception_types = (
+            "ilgi",
+            "iyelik"
+)
+
+major_vowel_exception = (
                             "ahval",
                             "akropol",
                             "alkol",
@@ -129,4 +130,4 @@ major_vowel_exception = {
                             "zeval",
                             "ziraat"
 
-}
+)
