@@ -1,9 +1,8 @@
 from setuptools import setup
 
 setup(name='turkishsuffix',
-      version='0.2.1',
-      description='A package for adding complex suffixes to Turkish words. While doing that,'
-                  ' code uses rule set and python\'s string manipulation to enhance the quality.'
+      version='0.3.0',
+      description='Package for managing turkish suffixes.'
                   ' You can find examples on GitHub page.',
       keywords='turkish suffix türkçe ek',
       url='http://github.com/yokunjon/turkishsuffix',
