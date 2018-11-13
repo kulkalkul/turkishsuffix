@@ -1,171 +1,129 @@
-from .loader import config
+import collections
+
+from .config_loader import config
+
+Settings = config["settings"]
+Exceptions = config["exceptions"]
 
 
-# The main class.
+SuffixWord = collections.namedtuple("SuffixWord", ("word", "suffix_type", "apostrophe", "possessive", "new_word",
+                                                   "suffix", "suffixed"))
+
+
+def lower_turkish(string):
+    new_string = [Settings.lowercase_i[Settings.uppercase_i.index(letter)] if letter in Settings.uppercase_i
+                  else letter.lower() for (i, letter) in enumerate(string)]
+    return "".join(new_string)
+
+
 class TurkishSuffix:
-    """Main class for suffix classes.
+    def __init__(self):
+        self.__rule_set = dict(zip(Settings.types, Settings.rule_set))
+        self.__possessive_rule_set = dict(zip(Settings.possessive_types, Settings.possessive_rule_set))
+        self.__buffer_exceptions = dict({key: Exceptions.buffer_exception for key in Exceptions.buffer_exception_types})
 
-    Arguments:
-    _word                     - STRING  - The word which will get suffix.
-    _type                     - STRING  - Name of the suffix.
-    _possessive               - STRING  - Preferred possessive state for the possessive suffix.
-
-    Returns:
-    self._word + self._suffix - STRING  - Word with proper suffix.
-    """
-    def __init__(self, _word, _type=None, _possessive=None):
-        self._word = self._old_word = _word
-        self._suffix, self._type, self._possessive = None, None, None
-        if _possessive is not None:
-            self._set_possessive(_type, _possessive)
-        elif _type is not None:
-            self._set_suffix(_type)
-
-    def _set_suffix(self, _type):
-        """Private method that creates the word with suffixes.
-
-        Arguments:
-        _type                     - STRING  - Name of the suffix.
-
-        Returns:
-        vowel                     - STRING  - Proper vowel for the type and word.
-        i                         - INTEGER - Index value of vowel in reversed word.
+    def suffix(self, word: str, suffix_type: str, apostrophe: bool = False, possessive: str = None) -> SuffixWord:
         """
-        self._type = _type
-        self._word = self._old_word
-        rule_set = config.rule_set[config.types.index(_type)]
-        index, division = int(rule_set[0]), int(rule_set[1])
-        first, last = rule_set[2], rule_set[3]
-        for i, letter in enumerate(self._old_word[::-1]):
-            first = self._check_hards(rule_set, first, letter)
-            if letter in config.vowels:
-                first = self._check_vowel(rule_set, first, _type, i)
-                vowel = config.suffixes[index + config.vowels.index(letter) // 2 % division]
-                self._suffix = first.replace("-", "").replace("+", "") + vowel + last.replace("-", "")
-                return vowel, i
 
-    def _set_possessive(self, _type, _possessive):
-        """Private method that creates the word with possessive suffixes.
-
-        Arguments:
-        _type                     - STRING  - Name of the suffix.
-        _possessive               - STRING  - Possessive state of the suffix.
+        :param word: Word which will suffixed.
+        :param suffix_type: The suffix which will suffix the word. It should be either of these: "çokluk", "ilgi",
+        "eşitlik", "yönelme", "belirtme", "bulunma", "ayrılma" and "iyelik".
+        :param apostrophe: If true, apostrophe will split the word and suffix. Also, word is preserved form post-suffix
+        changes. It should be either of these: True and False.
+        :param possessive: If set, this declares the person state of the possessive suffix. It should be one of these:
+        "1t", "2t", "3t", "1ç", "2ç", "3ç" and False.
+        :rtype: SuffixWord
         """
-        self._possessive = _possessive
-        possessive = config.possessive[int(_possessive[1].replace("t", "0").replace("ç", "3"))
-                                       + int(_possessive[0]) - 1]
-        if ";" in possessive:
-            self._set_suffix("çokluk")
-            plural = TurkishSuffix(self._suffix, "iyelik")
-            self._suffix = plural.get_word()
+        if suffix_type not in self.__rule_set:
+            raise KeyError("'{}' Hint: There is no suffix type with that name.".format(suffix_type))
+        index, division, first, last, *options = self.__rule_set[suffix_type]
+        index, division = int(index), int(division)
+
+        last_vowel = self.__vowel_from_backwards(word)
+        vowel = self.__vowel_harmony(word, index, division, last_vowel)
+        word, first, last, vowel, last_vowel = self.__possessive(word, suffix_type, index, division, first, last,
+                                                                 possessive, last_vowel, vowel)
+
+        first, last = first.replace("-", ""), last.replace("-", "")
+        first, consonant = self.__hards_and_softs(word, first, last_vowel, options, possessive)
+        first = self.__buffer_letter(word, suffix_type, first, last_vowel, options, possessive)
+
+        if apostrophe:
+            apostrophe = "'"
+            new_word = word
         else:
-            vowel, i = self._set_suffix("iyelik")
-            first, last = possessive[0], possessive[1]
-            rule_set = config.rule_set[config.types.index(_type)]
-            if i < 1 and self._word.lower() not in config.exceptions[config.types.index(_type)]\
-                    and ":" not in possessive and "," not in possessive:
-                self._suffix = first.replace("-", "").replace("+", "") + last.replace("-", "")
-            else:
-                self._suffix = first.replace("-", "").replace("+", "") + vowel + last.replace("-", "")
-            if i > 0 or self._word.lower() in config.exceptions[config.types.index(_type)] or "," in possessive:
-                if self._word.lower() in config.exceptions[config.types.index(_type)]:
-                    possessive = possessive.replace(",", "")
-                consonant = self._check_vowel(possessive, rule_set[2], _type, i)
-                if ":" in possessive:
-                    self._suffix = vowel + self._suffix
-                self._suffix = consonant.replace("-", "").replace("+", "") + self._suffix
+            apostrophe = ""
+            new_word = word[:-1] + consonant
 
-    def _check_hards(self, _rule_set, _first, _letter):
-        """Private method that checks hard consonants and do necessary changes.
+        suffix = first + vowel + last
+        suffixed = new_word + apostrophe + suffix
+        return SuffixWord(word, suffix_type, apostrophe, possessive, new_word, suffix, suffixed)
 
-        Arguments:
-        _rule_set                 - STRING  - Rule-set of the type.
-        _first                    - STRING  - First letter from the rule-set.
-        _letter                   - STRING  - Last vowel of the word.
+    def __possessive(self, word, suffix_type, index, division, first, last, possessive, last_vowel, vowel):
+        possessive_vowel = ""
+        if suffix_type is not "iyelik":
+            return word, first, last, vowel, last_vowel
+        if not possessive:
+            raise TypeError("suffix() missing 1 required positional argument: 'possessive'\n"
+                            "Hint: You can not use possessive suffix without defining possessive state.")
+        if possessive not in self.__possessive_rule_set:
+            raise KeyError("'{}' Hint: There is no possessive state with that name.".format(possessive))
+        possessive_first, possessive_last, *possessive_options = self.__possessive_rule_set[possessive]
+        if ";" in possessive_options:
+            plural = self.suffix(word, "çokluk")
+            possessive_first = possessive_first + plural.suffix
+            last_vowel = self.__vowel_from_backwards(plural.suffixed)
+            vowel = self.__vowel_harmony(plural.suffixed, index, division, last_vowel)
+        if ":" not in possessive_options and "," not in possessive_options and last_vowel is word[-1]:
+            if lower_turkish(word) not in self.__buffer_exceptions[suffix_type]:
+                vowel = ""
+        elif ":" in possessive_options and last_vowel is not word[-1]:
+            possessive_vowel = vowel
+        elif ":" in possessive_options and lower_turkish(word) in self.__buffer_exceptions[suffix_type]:
+            possessive_vowel = vowel
+        possessive_first = possessive_vowel + possessive_first
+        return word, possessive_first, possessive_last, vowel, last_vowel
 
-        Returns:
-        _first                    - STRING  - First letter from the rule-set with hard check.
-        """
-        if _letter in config.hards:
-            if _first[0] in "cd":
-                _first = _first.replace(_first[0], config.hards[config.softs.index(_first[0])])
-            elif ";" in _rule_set:
-                if config.hards.index(_letter) < 4:
-                    self._word = self._old_word[:-1] + config.softs[config.hards.index(_letter)]
-        return _first
+    def __vowel_harmony(self, word, index, division, last_vowel):
+        major = self.__major_vowel(word)
+        vowel_harmony = index + Settings.vowels.index(last_vowel) // 2 % division + major
+        return Settings.suffix_vowels[vowel_harmony]
 
-    def _check_vowel(self, _rule_set, _first, _type, _i):
-        """Private method that checks vowels and add "kaynaştırma" consonant.
+    def __major_vowel(self, word):
+        return lower_turkish(word) in Exceptions.major_vowel_exception
 
-        Arguments:
-        _rule_set                 - STRING  -Rule-set of the type.
-        _first                    - STRING  - First letter from the rule-set.
-        _type                     - STRING  - Name of the suffix.
-        _i                        - INTEGER - Index value of vowel in reversed word.
+    def __vowel_from_backwards(self, word):
+        vowel_from_backwards = (letter for letter in word[::-1] if letter in Settings.vowels)
+        return vowel_from_backwards.__next__()
 
-        Returns:
-        _first                    - STRING  - First letter from the rule-set with vowel check.
-        """
-        if _i < 1:
-            if ":" in _rule_set:
-                if self._word.lower() in config.exceptions[config.types.index(_type)]:
-                    _first = _first.replace("+", "y")
-                else:
-                    _first = _first.replace("+", "n")
-            elif "," in _rule_set:
-                _first = _first.replace("+", "s")
-            else:
-                _first = _first.replace("+", "y")
-        return _first
+    def __hards_and_softs(self, word, first, vowel, options, possessive):
+        last_letter = word[-1]
+        if vowel is word[-1]:
+            return first, last_letter
+        elif possessive == "3ç":
+            return first, last_letter
+        elif last_letter not in Settings.hards:
+            return first, last_letter
+        elif first in Settings.softs[:2]:
+            return Settings.hards[Settings.softs.index(first)], last_letter
+        elif ";" in options and last_letter in Settings.hards[:4]:
+            return first, Settings.softs[Settings.hards.index(last_letter)]
+        return first, last_letter
 
-    def get_word(self, _type=None, _proper=False, _possessive=None):
-        """Public method that returns the word with proper suffix and changes.
-        This method can also apply other suffixes and cases.
+    def __buffer_letter(self, word, suffix_type, first, vowel, options, possessive):
+        if vowel is not word[-1]:
+            return first.replace("+", "")
+        elif suffix_type in self.__buffer_exceptions and lower_turkish(word) in self.__buffer_exceptions[suffix_type]:
+            if possessive == "1ç" or possessive == "2ç":
+                return "y" + first
+            if first:
+                return first.replace("+", "y")
+            return first + "y"
+        if "," in options:
+            return first.replace("+", "s")
+        elif ":" not in options:
+            return first.replace("+", "y")
+        return first.replace("+", "n")
 
-        Arguments:
-        _type                     - STRING  - Name of the suffix.
-        _proper                   - BOOLEAN - Word is proper noun or not.
-        _possessive               - STRING  - Preferred possessive state for the possessive suffix.
 
-        Returns:
-        self._word + self._suffix - STRING  - Word with proper suffix.
-        """
-        if _possessive is not None:
-            self._set_possessive(_type, _possessive)
-        elif _type is not None:
-            self._set_suffix(_type)
-        if _proper is True:
-            return self._old_word + "'" + self._suffix
-        return self._word + self._suffix
-
-    def get_old_word(self):
-        """Public method that returns the unchanged word.
-
-        Returns:
-        self._old_word            - STRING  - Unchanged word.
-        """
-        return self._old_word
-
-    def get_suffix(self):
-        """Public method that returns only the suffix.
-
-        Returns:
-        self._suffix              - STRING  - Suffix.
-        """
-        return self._suffix
-
-    def get_type(self):
-        """Public method that returns the suffix type.
-
-        Returns:
-        self._type                - STRING  - Name of the suffix.
-        """
-        return self._type
-
-    def get_possessive(self):
-        """Public method that returns possessive state of the suffix.
-
-        Returns:
-        self._possessive          - STRING  - Possessive state of the suffix.
-        """
-        return self._possessive
+turkishSuffix = TurkishSuffix()
