@@ -22,20 +22,20 @@ turkishsuffix has 2 components:
   * iyelik hali (possessive form)
 
 * Exception system for "ne" and "su" is working right now. Normally, buffer letter 
-for genitive form is "n", but those two words are exceptions and use "y" as the buffer
-letter. The reason is these two words originally spelled with an "y" e.g. "suy" and "ney". But
-over time, that became archaic. Same thing also applies for possessive form but in much
+for the genitive form is "n", but those two words are exceptions and use "y" as the buffer
+letter. The reason is these two words originally spelled with a "y" e.g. "suy" and "ney". But
+over time, that became archaic. The same thing also applies for possessive form but in a much
 more complex manner.
 
-* Exception system for non-turkish words is working. Turkish has a vowel harmony
-based on the last vowel of the word. But some non-turkish does not follow this rule.
-For example, plural form of "hayal" -an Arabic word for dream- looks like should be
-"lar", but actually its "ler". The reason behind is a archaic feature of the language.
+* Exception system for non-Turkish words is working. Turkish has a vowel harmony
+based on the last vowel of the word. But some non-Turkish does not follow this rule.
+For example, the plural form of "hayal" -an Arabic word meaning "dream"- looks like should be
+"lar", but actually its "ler". The reason behind is an archaic feature of the language.
 The last "a" of "hayal" is pronounced softly than the other. Normally, it is described
-with a carret (^) like "hayâl". But as it is archaic in most words, it fools the
+with a caret (^) like "hayâl". But as it is archaic in most words, it fools the
 computer. I fixed this with an exception list.
 
-* There is an option for apostrophe in proper names (like human names, city names etc.).
+* There is an option for an apostrophe in proper names (like human names, city names etc.).
 
 ### What are Missing?
 
@@ -78,7 +78,7 @@ that is Turkish having a complex suffix system. Instead of "Bora'nın", "Deniz'i
 should encourage people to use normal ones. If we can encourage people to use this,
 even Facebook may change how they approach into this issue.
 
-You can check out the more examples at /example.
+You can check out examples at /example.
 
 (Bilkent Üniversitesi'**ne**) - not "ye".
 
