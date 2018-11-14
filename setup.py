@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='turkishsuffix',
-      version='0.3.1',
+      version='0.3.2',
       description='Package for managing turkish suffixes.'
                   ' You can find examples on GitHub page.',
       keywords='turkish suffix türkçe ek',
