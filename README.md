@@ -1,3 +1,6 @@
+# Deprecated
+I'm no longer maintaining this, haven't used python for 5 years. I don't remember my implementation and I think it is overengineered as it was one of the first things I wrote with python (I ported it from some bespoke scripting language I worked with).
+
 # What is turkishsuffix?
 
 turkishsuffix is a library to add complex suffixes to Turkish words.
